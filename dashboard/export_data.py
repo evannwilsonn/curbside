@@ -44,7 +44,7 @@ def main() -> None:
         "daily": table(con, "select date_day, trips, gross_revenue, weather_type, is_holiday, holiday_name, precip_in, snow_in from reporting.rpt_kpi_daily order by 1"),
         "boroughs": table(con, "select strftime(month_start, '%Y-%m') as month, borough, trips, gross_revenue, revenue_per_trip, avg_speed_mph from reporting.rpt_borough_monthly order by 1, 3 desc"),
         "zones": table(con, "select strftime(month_start, '%Y-%m') as month, zone_name, borough, trips, revenue_per_trip from reporting.rpt_zone_monthly order by 1, 4 desc"),
-        "hours": table(con, "select weekday_num, pickup_hour, avg_trips, avg_speed_mph from reporting.rpt_hour_of_week order by 1, 2"),
+        "hours": table(con, "select strftime(month_start, '%Y-%m') as month, weekday_num, pickup_hour, avg_trips, avg_speed_mph from reporting.rpt_hour_of_week order by 1, 2, 3"),
         "weather": table(con, "select weather_type, days, avg_trips, trips_vs_dry, avg_speed_mph, card_tip_rate from reporting.rpt_weather_impact"),
         "dq": table(con, "select strftime(month_start, '%Y-%m') as month, status, records, share_of_month from reporting.rpt_data_quality_monthly order by 1, 3 desc"),
         "pipeline": {

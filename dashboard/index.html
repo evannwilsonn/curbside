@@ -2,272 +2,412 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Curbside</title>
+<meta name="description" content="NYC taxi business KPIs from 76 million validated trip records, set as a monthly business-page edition.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,500&family=Libre+Franklin:wght@400;500;600;700;800&display=swap">
 <style>
+/* A business section, one edition per month. Newsprint, ink, hairline column rules,
+   taxi yellow only as a highlighter behind ink. */
 :root{
   color-scheme:light;
-  --bg:#f4f5f7;--surface:#ffffff;--surface-2:#f8f9fb;--line:#e3e5ea;--line-2:#d3d6dd;
-  --text:#14161c;--text-2:#4a4f5c;--text-3:#767b88;
-  --s1:#2a6fdb;--s2:#a8630f;--s3:#16865a;--up:#16865a;--down:#c2412d;--focus:#2a6fdb;
-  --ok:#16865a;--ok-bg:rgba(22,134,90,.10);--warn:#a8630f;--warn-bg:rgba(168,99,15,.12);--bad:#c2412d;--bad-bg:rgba(194,65,45,.10);
-  --font:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --ground:#e9e7df;--paper:#f6f5f0;--rule:#c9c6bb;--rule-2:#8f8b80;
+  --ink:#191917;--ink-2:#45443f;--ink-3:#6b6960;
+  --hi:#f3c613;--hi-ink:#191917;--hi-wash:rgba(243,198,19,.38);
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"Libre Franklin",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  color-scheme:dark;--bg:#0c0c12;--surface:#13131b;--surface-2:#191922;--line:#25252f;--line-2:#33333f;
-  --text:#f2f3f6;--text-2:#b4b7c2;--text-3:#878a96;--s1:#3d7eff;--s2:#c27a1a;--s3:#1fa36b;--up:#4cc38a;--down:#ff7a6b;--focus:#7ea8ff;
-  --ok:#4cc38a;--ok-bg:rgba(76,195,138,.12);--warn:#e0a24a;--warn-bg:rgba(224,162,74,.13);--bad:#ff7a6b;--bad-bg:rgba(255,122,107,.12)}}
+  color-scheme:dark;
+  --ground:#141413;--paper:#1c1c1a;--rule:#36352f;--rule-2:#6a675d;
+  --ink:#eeece4;--ink-2:#c4c1b6;--ink-3:#9a978c;
+  --hi:#e8b923;--hi-ink:#141413;--hi-wash:rgba(232,185,35,.28)}}
 :root[data-theme="dark"]{
-  color-scheme:dark;--bg:#0c0c12;--surface:#13131b;--surface-2:#191922;--line:#25252f;--line-2:#33333f;
-  --text:#f2f3f6;--text-2:#b4b7c2;--text-3:#878a96;--s1:#3d7eff;--s2:#c27a1a;--s3:#1fa36b;--up:#4cc38a;--down:#ff7a6b;--focus:#7ea8ff;
-  --ok:#4cc38a;--ok-bg:rgba(76,195,138,.12);--warn:#e0a24a;--warn-bg:rgba(224,162,74,.13);--bad:#ff7a6b;--bad-bg:rgba(255,122,107,.12)}
+  color-scheme:dark;
+  --ground:#141413;--paper:#1c1c1a;--rule:#36352f;--rule-2:#6a675d;
+  --ink:#eeece4;--ink-2:#c4c1b6;--ink-3:#9a978c;
+  --hi:#e8b923;--hi-ink:#141413;--hi-wash:rgba(232,185,35,.28)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 var(--font)}
-:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px}
-.wrap{max-width:1320px;margin:0 auto;padding:24px 20px 48px}
-header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:16px}
-.brand h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.01em}
-.brand p{margin:4px 0 0;color:var(--text-2);font-size:14px}
-.badge{display:inline-block;margin-left:8px;font:500 11px var(--mono);color:var(--text-3);border:1px solid var(--line-2);border-radius:999px;padding:2px 8px;vertical-align:3px}
-.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-select{font:500 13px var(--font);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer}
-.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px}
-.seg button{font:500 13px var(--font);color:var(--text-2);background:none;border:0;border-radius:7px;padding:7px 12px;cursor:pointer}
-.seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--text);box-shadow:inset 0 0 0 1px var(--line-2)}
-.brief{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center}
-.brief p{margin:0;font-size:15.5px;line-height:1.55;max-width:90ch}
-.brief p b{font-weight:600}
-.tally{display:flex;gap:8px;flex-wrap:wrap}
-.pill{display:inline-flex;align-items:center;gap:6px;font:600 12px var(--font);border-radius:999px;padding:3px 10px;white-space:nowrap}
-.pill.ok{color:var(--ok);background:var(--ok-bg)}.pill.warn{color:var(--warn);background:var(--warn-bg)}.pill.bad{color:var(--bad);background:var(--bad-bg)}.pill.na{color:var(--text-3);background:var(--surface-2)}
-.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.cat-h{margin:18px 2px 8px;font:600 12px var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
-.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
-.tile .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.tile .eyebrow{font:500 10.5px var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
-.tile .lbl{font-size:13px;font-weight:500;color:var(--text-2)}
-.tile .v{font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.tile .cmp{font-size:12.5px;color:var(--text-3);display:flex;gap:12px;flex-wrap:wrap}
-.tile .cmp b{font-weight:600}
-.tile svg{display:block;width:100%;height:34px;margin-top:4px}
-.good{color:var(--up)}.badc{color:var(--down)}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
-.card header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-.card h2{margin:0;font-size:15px;font-weight:600}
-.card .sub{font-size:12.5px;color:var(--text-3)}
-.full{grid-column:1/-1}
-.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--text-2)}
-.legend i{display:inline-block;width:12px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
-.legend i.ln{height:2px;vertical-align:3px}
-.plot{position:relative}
-.plot svg{display:block;width:100%;height:auto;overflow:visible}
-.ax{font:11px var(--font);fill:var(--text-3)}
-.gridl{stroke:var(--line);stroke-width:1}
-.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;padding:8px 10px;font-size:12.5px;white-space:nowrap;opacity:0;transform:translate(-50%,calc(-100% - 12px));transition:opacity .12s;z-index:3;box-shadow:0 8px 24px rgba(0,0,0,.18)}
-.tip.on{opacity:1}.tip b{font-weight:600}.tip span{color:var(--text-2)}
-.callout{margin:12px 0 0;padding:10px 12px;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;font-size:13.5px;color:var(--text-2)}
-.callout b{color:var(--text);font-weight:600}
-table{width:100%;border-collapse:collapse;font-size:13.5px}
-th{font-weight:500;color:var(--text-3);text-align:right;padding:8px 6px;border-bottom:1px solid var(--line);font-size:12px;white-space:nowrap}
-th:first-child,td:first-child{text-align:left}
-td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-td .wbar{display:inline-block;height:8px;border-radius:3px;background:var(--s1);margin-right:8px;vertical-align:0}
-.dbar{display:grid;grid-template-columns:150px minmax(0,1fr) 92px;gap:10px;align-items:center;padding:6px 0;font-size:13px}
-.dbar .track{height:14px;background:var(--surface-2);border-radius:4px;overflow:hidden}
-.dbar .fill{height:100%;border-radius:4px}
-.dbar .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--text-2)}
-.dbar small{display:block;color:var(--text-3);font-size:11.5px}
-.heat{display:grid;gap:3px;font-size:11.5px;font-variant-numeric:tabular-nums}
-.heat .c{padding:5px 2px;text-align:center;border-radius:4px;color:var(--text)}
-.heat .h{color:var(--text-3);text-align:center;padding:4px 0}
-.heat .rl{color:var(--text-2);text-align:left;padding:5px 4px;white-space:nowrap}
-.defs{margin:0;padding:0;list-style:none;font-size:13px}
-.defs li{padding:7px 0;border-bottom:1px solid var(--line);color:var(--text-2)}
-.defs li:last-child{border-bottom:0}
-.defs b{color:var(--text);font-weight:600}
-footer.lin{margin-top:18px;color:var(--text-3);font-size:12.5px;line-height:1.6}
-footer.lin code{font-family:var(--mono);font-size:12px;color:var(--text-2)}
-footer.lin a{color:var(--text-2)}
-@media (max-width:1100px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:900px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}.brief{grid-template-columns:1fr}}
-@media (max-width:560px){.tiles{grid-template-columns:1fr}.hide-sm{display:none}.dbar{grid-template-columns:110px minmax(0,1fr) 80px}}
-.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
-.step{padding:14px 16px;border-right:1px solid var(--line)}.step:last-child{border-right:0}
-td small{display:block;color:var(--text-3);font-size:11.5px}
-.step .n{font:500 11px var(--mono);color:var(--text-3)}.step b{display:block;font-size:14px;font-weight:600;margin:2px 0}.step span{font-size:12.5px;color:var(--text-2)}
-@media (max-width:900px){.flow{grid-template-columns:1fr}.step{border-right:0;border-bottom:1px solid var(--line)}}
-</style>
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font:17px/1.5 var(--serif);font-variant-numeric:tabular-nums lining-nums}
+a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.sheet{max-width:1280px;margin:0 auto;background:var(--paper);padding:20px clamp(16px,3.4vw,44px) 36px;min-height:100vh}
+mark{background:linear-gradient(transparent 12%,var(--hi-wash) 12%,var(--hi-wash) 88%,transparent 88%);color:inherit;padding:0 .12em}
 
+/* masthead */
+.mast{text-align:center;border-bottom:4px double var(--ink);padding-bottom:10px}
+.ears{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;font:500 12.5px/1.35 var(--sans);color:var(--ink-2)}
+.ears div{max-width:30ch;text-align:left}
+.ears div:last-child{text-align:right}
+.title{font:800 clamp(38px,7.2vw,86px)/.95 var(--serif);letter-spacing:-.025em;margin:10px 0 8px;font-variation-settings:"opsz" 72}
+.dateline{display:flex;justify-content:center;align-items:center;gap:8px 18px;flex-wrap:wrap;border-top:1px solid var(--ink);padding-top:7px;font:500 13px var(--sans);color:var(--ink-2)}
+.dateline select{font:700 14px var(--sans);color:var(--ink);background:var(--paper);border:1px solid var(--ink);padding:4px 26px 4px 8px;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 13px) 55%,calc(100% - 8px) 55%;background-size:5px 5px;background-repeat:no-repeat;cursor:pointer}
+@media (max-width:720px){.ears div:first-child{display:none}.ears{justify-content:center}.ears div:last-child{text-align:center}}
+
+/* front: headline */
+.front{padding:18px 0 14px;border-bottom:1px solid var(--ink)}
+.hed{font:700 clamp(30px,4.6vw,54px)/1.03 var(--serif);letter-spacing:-.02em;margin:0;max-width:30ch;text-wrap:balance;font-variation-settings:"opsz" 60}
+.dek{font:italic 400 clamp(18px,1.9vw,22px)/1.35 var(--serif);color:var(--ink-2);margin:10px 0 0;max-width:62ch}
+.byline{font:500 12.5px var(--sans);color:var(--ink-3);margin-top:10px}
+
+/* columns */
+.cols{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:0;border-bottom:3px solid var(--ink)}
+.cols>section{padding:16px 0 20px}
+.cols>section+section{border-left:1px solid var(--rule-2);padding-left:24px;margin-left:24px}
+@media (max-width:920px){.cols{grid-template-columns:1fr}.cols>section+section{border-left:0;margin-left:0;padding-left:0;border-top:1px solid var(--rule-2)}}
+h2.item{font:700 24px/1.15 var(--serif);margin:0 0 8px;letter-spacing:-.01em;border-top:1px solid var(--ink);padding-top:8px}
+p.body{margin:0 0 10px;color:var(--ink-2);font-size:16.5px}
+
+/* the stock table */
+table.stocks{width:100%;border-collapse:collapse;font:400 15.5px var(--serif)}
+.stocks th{font:700 11px/1.2 var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);text-align:right;padding:8px 6px 6px;border-bottom:1px solid var(--ink)}
+.stocks th:first-child{text-align:left}
+.stocks td{padding:7px 6px;border-bottom:1px solid var(--rule);text-align:right;white-space:nowrap}
+.stocks td:first-child{text-align:left;white-space:normal}
+.stocks tr.k{cursor:pointer}
+.stocks tr.k:hover td{background:var(--hi-wash)}
+.stocks tr.k:focus{outline:none}
+.stocks tr.k:focus-visible td{box-shadow:inset 0 2px 0 var(--ink),inset 0 -2px 0 var(--ink)}
+.stocks tr.open td{background:var(--hi-wash);border-bottom-color:transparent}
+.stocks .nm{font-weight:600}
+.stocks .cat{display:block;font:500 11.5px var(--sans);color:var(--ink-3)}
+.stocks .up::before{content:"\25B2\00A0";font-size:.7em}
+.stocks .dn::before{content:"\25BC\00A0";font-size:.7em}
+.stocks .flat{color:var(--ink-3)}
+.v{font:700 12px var(--sans);letter-spacing:.03em;text-transform:uppercase}
+.v.off{background:var(--ink);color:var(--paper);padding:2px 5px}
+.v.watch{border:1px solid var(--ink);padding:1px 4px}
+.v.on{color:var(--ink-2)}
+.v.none{color:var(--ink-3);font-weight:500;text-transform:none;letter-spacing:0}
+.stocks tr.trend td{padding:2px 6px 14px;background:var(--hi-wash);white-space:normal;text-align:left}
+.trend p{margin:4px 0 0;font:400 14.5px/1.45 var(--serif);color:var(--ink-2);max-width:66ch}
+.tgt-s{display:none !important}
+@media (max-width:600px){.hide-s{display:none}.stocks{font-size:14.5px}.tgt-s{display:block !important}}
+.note{font:400 13px/1.45 var(--sans);color:var(--ink-3);margin:8px 0 0}
+
+/* charts */
+svg.chart{display:block;width:100%;overflow:visible}
+.ax{font:500 11px var(--sans);fill:var(--ink-3)}
+.lb{font:600 11.5px var(--sans);fill:var(--ink)}
+.cap{font:italic 400 14px/1.4 var(--serif);color:var(--ink-2);margin:6px 0 0}
+
+/* news items */
+.items{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.items>article{padding:16px 22px 22px;border-left:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2)}
+.items>article:first-child{border-left:0;padding-left:0}
+.items>article:last-child{padding-right:0}
+@media (max-width:1100px){.items{grid-template-columns:repeat(2,minmax(0,1fr))}.items>article:nth-child(odd){border-left:0;padding-left:0}.items>article:nth-child(even){padding-right:0}}
+@media (max-width:700px){.items{grid-template-columns:1fr}.items>article{border-left:0;padding-left:0;padding-right:0}}
+table.small{width:100%;border-collapse:collapse;font:400 15px var(--serif)}
+.small th{font:700 10.5px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);text-align:right;padding:6px 4px;border-bottom:1px solid var(--ink)}
+.small th:first-child{text-align:left}
+.small td{padding:5px 4px;border-bottom:1px solid var(--rule);text-align:right;white-space:nowrap}
+.small td:first-child{white-space:normal}
+.small td:first-child{text-align:left}
+.bar{display:inline-block;height:9px;background:var(--ink);vertical-align:middle;margin-right:6px}
+ol.zones{margin:0;padding:0;list-style:none;counter-reset:z}
+ol.zones li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:6px;padding:5px 0;border-bottom:1px solid var(--rule);font-size:15px;counter-increment:z}
+ol.zones li::before{content:counter(z);font:700 12px/1.9 var(--sans);color:var(--ink-3)}
+ol.zones small{display:block;font:500 11.5px var(--sans);color:var(--ink-3)}
+
+.press{margin-top:22px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:3px solid var(--ink);border-bottom:1px solid var(--ink)}
+.press div{padding:10px 14px 12px;border-left:1px solid var(--rule)}
+.press div:first-child{border-left:0;padding-left:0}
+.press b{display:block;font:800 12px var(--sans);letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
+.press span{font:400 14.5px/1.4 var(--serif);color:var(--ink-2)}
+@media (max-width:900px){.press{grid-template-columns:1fr}.press div{border-left:0;padding-left:0;border-top:1px solid var(--rule)}.press div:first-child{border-top:0}}
+footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 12.5px var(--sans);color:var(--ink-3);padding-top:12px}
+.themebtn{font:600 12px var(--sans);background:none;border:1px solid var(--rule-2);color:var(--ink-2);padding:4px 10px;cursor:pointer}
+</style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <div class="brand">
-      <h1>Curbside <span class="badge">Real public data</span></h1>
-      <p>NYC taxi operations · end-to-end pipeline and executive KPI dashboard · official TLC trip records</p>
+<div class="sheet">
+  <header class="mast">
+    <div class="ears">
+      <div>Built from 76 million trip records the NYC Taxi &amp; Limousine Commission publishes each month</div>
+      <div id="earR"></div>
     </div>
-    <div class="controls">
-      <label><span hidden>Month</span><select id="month" aria-label="Reporting month"></select></label>
-      <div class="seg" role="group" aria-label="Compare against">
-        <button type="button" data-c="target" aria-pressed="true">vs. target</button>
-        <button type="button" data-c="yoy" aria-pressed="false">vs. last year</button>
-      </div>
+    <h1 class="title">The Curbside Ledger</h1>
+    <div class="dateline">
+      <span>New York City taxi business</span>
+      <label>Edition <select id="edition" aria-label="Choose the month"></select></label>
+      <span id="dl"></span>
     </div>
   </header>
 
-  <section class="flow" id="flow" aria-label="Pipeline"></section>
-  <section class="brief" aria-label="Summary"><p id="brief"></p><div class="tally" id="tally"></div></section>
-  <section id="scorecard" aria-label="KPI scorecard"></section>
-
-  <section class="grid">
-    <article class="card full">
-      <header><h2>Daily trips</h2>
-        <div class="legend"><span><i class="ln" style="background:var(--s1)"></i>7-day average</span><span><i style="background:var(--line-2)"></i>Daily</span><span><i style="background:var(--s2)"></i>Snow day</span></div></header>
-      <div class="plot" id="daily"></div>
-    </article>
-    <article class="card">
-      <header><h2>Weather and demand</h2><span class="sub">Trips vs. a dry day of the same kind (weekday or weekend)</span></header>
-      <div id="weather"></div>
-      <p class="callout" id="weatherNote"></p>
-    </article>
-    <article class="card">
-      <header><h2>When people ride</h2><span class="sub">Average trips per hour, last 3 months</span></header>
-      <div id="heat" style="overflow-x:auto"></div>
-    </article>
-    <article class="card">
-      <header><h2>Boroughs</h2><span class="sub" id="boroSub"></span></header>
-      <div style="overflow-x:auto"><table id="boros"></table></div>
-    </article>
-    <article class="card">
-      <header><h2>Busiest pickup zones</h2><span class="sub" id="zoneSub"></span></header>
-      <div style="overflow-x:auto"><table id="zones"></table></div>
-    </article>
-    <article class="card">
-      <header><h2>What the pipeline excluded</h2><span class="sub" id="dqSub"></span></header>
-      <div id="dq"></div>
-      <p class="callout" id="dqNote"></p>
-    </article>
-    <article class="card">
-      <header><h2>KPI definitions</h2><span class="sub">One governed definition per metric, from <code>seeds/kpi_definitions.csv</code></span></header>
-      <ul class="defs" id="defs"></ul>
-    </article>
+  <section class="front" aria-live="polite">
+    <h2 class="hed" id="hed"></h2>
+    <p class="dek" id="dek"></p>
+    <div class="byline" id="byline"></div>
   </section>
-  <footer class="lin" id="lineage"></footer>
+
+  <div class="cols">
+    <section>
+      <h2 class="item">The scorecard</h2>
+      <table class="stocks" id="stocks"></table>
+      <p class="note">Select a line for its 19-month trend, definition and target. Targets and definitions are governed in <code>seeds/kpi_definitions.csv</code>.</p>
+    </section>
+    <section>
+      <h2 class="item" id="leadH"></h2>
+      <svg class="chart" id="daily" role="img"></svg>
+      <p class="cap" id="dailyCap"></p>
+      <h2 class="item" id="hourH" style="margin-top:22px"></h2>
+      <svg class="chart" id="hours" role="img"></svg>
+      <p class="cap" id="hourCap"></p>
+    </section>
+  </div>
+
+  <div class="items">
+    <article>
+      <h2 class="item" id="boroH"></h2>
+      <table class="small" id="boro"></table>
+    </article>
+    <article>
+      <h2 class="item" id="zoneH"></h2>
+      <ol class="zones" id="zones"></ol>
+    </article>
+    <article>
+      <h2 class="item" id="dqH"></h2>
+      <table class="small" id="dq"></table>
+    </article>
+    <article>
+      <h2 class="item" id="wxH"></h2>
+      <table class="small" id="wx"></table>
+      <p class="cap" id="wxCap"></p>
+    </article>
+  </div>
+
+  <div class="press" id="press"></div>
+  <footer>
+    <span id="foot"></span>
+    <a href="https://github.com/evannwilsonn/curbside" target="_blank" rel="noopener">github.com/evannwilsonn/curbside</a>
+    <button class="themebtn" id="theme" type="button">Switch theme</button>
+  </footer>
 </div>
-
 <script>
-(async function(){
-const D = window.CB_DATA || await fetch('data.json').then(r=>r.json());
+(async () => {
+const D = window.CB_DATA || await fetch('data.json').then(r => r.json());
+const NS = 'http://www.w3.org/2000/svg';
 const $ = id => document.getElementById(id);
-const objs = t => t.rows.map(r=>Object.fromEntries(t.columns.map((c,i)=>[c,r[i]])));
-const cat=objs(D.kpi_catalog), kpis=objs(D.kpis), daily=objs(D.daily), boros=objs(D.boroughs), zones=objs(D.zones), hours=objs(D.hours), weather=objs(D.weather), dq=objs(D.dq);
-const CAT=Object.fromEntries(cat.map(k=>[k.kpi_id,k]));
-const months=[...new Set(kpis.map(r=>r.month))].sort();
-const K={}; kpis.forEach(r=>{(K[r.month] ||= {})[r.kpi_id]=r});
-let state={month:months[months.length-1], cmp:'target'};
-const P=D.pipeline;
+const el = (t, a = {}, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const T = t => t.rows.map(r => Object.fromEntries(t.columns.map((c, i) => [c, r[i]])));
+const cat = T(D.kpi_catalog), kpis = T(D.kpis), daily = T(D.daily), boros = T(D.boroughs), zones = T(D.zones), hours = T(D.hours), wx = T(D.weather), dq = T(D.dq);
+const C = Object.fromEntries(cat.map(k => [k.kpi_id, k]));
+const months = [...new Set(kpis.map(k => k.month))].sort();
+const mName = m => new Date(m + '-15').toLocaleDateString('en-US', {month: 'long', year: 'numeric'});
+const mShort = m => new Date(m + '-15').toLocaleDateString('en-US', {month: 'short'});
+const big = v => v >= 1e9 ? (v / 1e9).toFixed(2) + 'B' : v >= 1e6 ? (v / 1e6).toFixed(v >= 1e8 ? 0 : v >= 1e7 ? 1 : 2) + 'M' : v >= 1e4 ? Math.round(v / 1e3) + 'K' : Math.round(v).toLocaleString('en-US');
+function fmt(id, v) {
+  if (v == null) return '–';
+  const u = C[id]?.unit;
+  if (u === 'count') return big(v);
+  if (u === 'currency') return v >= 1e5 ? '$' + big(v) : '$' + v.toFixed(2);
+  if (u === 'percent') return (v * 100).toFixed(1) + '%';
+  if (u === 'mph') return v.toFixed(1) + ' mph';
+  if (u === 'minutes') return v.toFixed(1) + ' min';
+  return String(v);
+}
+// change: percent units in points, the rest relative
+function chg(id, v, p) {
+  if (v == null || p == null || p === 0) return null;
+  return C[id]?.unit === 'percent' ? {d: (v - p) * 100, pts: true} : {d: (v / p - 1) * 100, pts: false};
+}
+const chgTxt = c => c == null ? '–' : (Math.abs(c.d) < .05 ? '0.0' : Math.abs(c.d).toFixed(1)) + (c.pts ? ' pts' : '%');
+const chgCls = c => c == null || Math.abs(c.d) < .05 ? 'flat' : c.d > 0 ? 'up' : 'dn';
+const ORDER = ['trips', 'gross_revenue', 'revenue_per_trip', 'fare_per_mile', 'avg_speed_mph', 'avg_trip_minutes', 'airport_share', 'card_tip_rate', 'cbd_fee_revenue', 'green_share', 'valid_record_rate'];
+const VERDICT = {'On track': ['on', 'On track'], 'Watch': ['watch', 'Watch'], 'Off track': ['off', 'Off track']};
+let month = months.at(-1), openKpi = null;
 
-const mLabel=(m,long)=>new Date(m.slice(0,7)+'-15').toLocaleDateString('en-US',long?{month:'long',year:'numeric'}:{month:'short',year:'2-digit'});
-const usd=(v,d=0)=>{if(v==null)return '–';const a=Math.abs(v);return a>=1e6?'$'+(v/1e6).toFixed(1)+'M':a>=1e4?'$'+Math.round(v/1e3)+'K':'$'+v.toFixed(d)};
-const big=v=>v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e4?Math.round(v/1e3)+'K':Math.round(v).toLocaleString('en-US');
-const fmt=(u,v)=>v==null?'–':u==='currency'?usd(v,2):u==='percent'?(v*100).toFixed(1)+'%':u==='mph'?v.toFixed(1)+' mph':u==='minutes'?v.toFixed(1)+' min':big(v);
-const sp=(v,d=1)=>v==null||!isFinite(v)?'–':(v>0?'+':'')+(v*100).toFixed(d)+'%';
-const pillCls=s=>s==='On track'?'ok':s==='Watch'?'warn':s==='Off track'?'bad':'na';
-const better=(k,x)=>x==null?'':((CAT[k].direction==='up')===(x>0)?'good':'badc');
+/* edition picker */
+$('edition').innerHTML = months.slice().reverse().map(m => `<option value="${m}">${mName(m)}</option>`).join('');
+$('edition').addEventListener('change', e => { month = e.target.value; render(); });
 
-$('flow').innerHTML=[
-  ['01','Extract',`${P.files} files from NYC TLC and Open-Meteo, ${P.gigabytes.toFixed(1)} GB, SHA-256 logged`],
-  ['02','Load',`${(P.raw_records/1e6).toFixed(1)}M raw trip records landed as published`],
-  ['03','Validate',`${P.rules} rules; ${(P.valid_records/P.raw_records*100).toFixed(1)}% of records pass`],
-  ['04','Model',`dbt star schema with weather, holidays and zones; tested on every build`],
-  ['05','Report',`${cat.length} governed KPIs with targets and year-over-year`],
-].map(([n,b,s])=>`<div class="step"><span class="n">${n}</span><b>${b}</b><span>${s}</span></div>`).join('');
+function rowsFor(m) { return ORDER.map(id => kpis.find(k => k.month === m && k.kpi_id === id)).filter(Boolean); }
+function targetTxt(k) {
+  const c = C[k.kpi_id];
+  if (!c || c.target_type === 'none' || k.target == null) return '–';
+  return fmt(k.kpi_id, k.target);
+}
 
-function renderBrief(){
-  const m=K[state.month], t=m.trips, r=m.gross_revenue, s=m.avg_speed_mph;
-  const st=Object.values(m).filter(x=>x.status), ok=st.filter(x=>x.status==='On track').length, w=st.filter(x=>x.status==='Watch'), b=st.filter(x=>x.status==='Off track');
-  const names=a=>a.map(x=>CAT[x.kpi_id].kpi_name.toLowerCase()).join(', ');
-  const yo=(x)=>x.prior_year_value?` (${sp(x.value/x.prior_year_value-1,1)} year over year)`:'';
-  let h=`<b>${mLabel(state.month,1)}:</b> ${big(t.value)} trips${yo(t)} brought in <b>${usd(r.value)}</b>${yo(r)}. Average speed was ${s.value.toFixed(1)} mph and each trip earned ${usd(m.revenue_per_trip.value,2)}. `;
-  h+=st.length?`${ok} of ${st.length} targeted KPIs are on track`+(b.length?`; off track: ${names(b)}`:'')+(w.length?`; watch: ${names(w)}`:'')+'.':'Targets start once there is a year to compare against.';
-  $('brief').innerHTML=h;
-  $('tally').innerHTML=st.length?`<span class="pill ok">${ok} on track</span><span class="pill warn">${w.length} watch</span><span class="pill bad">${b.length} off track</span>`:'<span class="pill na">No plan yet</span>';
+function headline(m) {
+  const rows = rowsFor(m);
+  const t = rows.find(r => r.kpi_id === 'trips'), rpt = rows.find(r => r.kpi_id === 'revenue_per_trip');
+  const ty = chg('trips', t?.value, t?.prior_year_value);
+  const withT = rows.filter(r => r.status);
+  const met = withT.filter(r => r.status === 'On track').length;
+  let h;
+  if (ty) h = `Trips ${ty.d >= 0 ? 'rise' : 'slip'} ${Math.abs(ty.d).toFixed(1)}% from a year ago`;
+  else { const tm = chg('trips', t?.value, t?.prior_month_value); h = tm ? `Trips ${tm.d >= 0 ? 'rise' : 'slip'} ${Math.abs(tm.d).toFixed(1)}% on the month` : `${big(t?.value || 0)} trips in the first edition`; }
+  if (rpt) h += `; ${rpt.value >= (rpt.target || 0) ? 'revenue per trip holds above' : 'revenue per trip falls below'} ${fmt('revenue_per_trip', rpt.target || rpt.value)}`;
+  const off = withT.filter(r => r.status === 'Off track').map(r => C[r.kpi_id].kpi_name.toLowerCase());
+  const watch = withT.filter(r => r.status === 'Watch').map(r => C[r.kpi_id].kpi_name.toLowerCase());
+  const list = a => a.length > 1 ? a.slice(0, -1).join(', ') + ' and ' + a.at(-1) : a[0];
+  let dek = `${met} of ${withT.length} measures with a target are on track in ${mName(m)}.`;
+  if (off.length) dek += ` Off track: ${list(off)}.`;
+  if (watch.length) dek += ` To watch: ${list(watch)}.`;
+  if (!ty) dek += ' Year-over-year comparisons begin in January 2026.';
+  return {h, dek};
 }
-function spark(k){
-  const i=months.indexOf(state.month), ms=months.slice(Math.max(0,i-11),i+1), vs=ms.map(m=>K[m][k].value);
-  const W=200,H=34,lo=Math.min(...vs),hi=Math.max(...vs),y=v=>hi===lo?H/2:3+(H-6)*(1-(v-lo)/(hi-lo)),x=j=>ms.length===1?W/2:2+(W-4)*j/(ms.length-1);
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${vs.map((v,j)=>(j?'L':'M')+x(j).toFixed(1)+' '+y(v).toFixed(1)).join('')}" fill="none" stroke="var(--s1)" stroke-width="1.6" vector-effect="non-scaling-stroke"/><circle cx="${x(vs.length-1)}" cy="${y(vs[vs.length-1])}" r="2.5" fill="var(--s1)"/></svg>`;
+
+function drawStocks() {
+  const rows = rowsFor(month);
+  const tb = $('stocks');
+  const hasYoy = rows.some(r => r.prior_year_value != null);
+  tb.innerHTML = `<thead><tr><th>Measure</th><th>${mShort(month)}</th><th class="${hasYoy ? 'hide-s' : ''}">On month</th>${hasYoy ? '<th>On year</th>' : ''}<th class="hide-s">Target</th><th>Verdict</th></tr></thead><tbody></tbody>`;
+  const body = tb.querySelector('tbody');
+  rows.forEach(k => {
+    const c = C[k.kpi_id], mo = chg(k.kpi_id, k.value, k.prior_month_value), yo = chg(k.kpi_id, k.value, k.prior_year_value);
+    const [vc, vt] = VERDICT[k.status] || ['none', 'no target'];
+    const tr = document.createElement('tr');
+    tr.className = 'k' + (openKpi === k.kpi_id ? ' open' : '');
+    tr.tabIndex = 0;
+    tr.setAttribute('aria-expanded', openKpi === k.kpi_id);
+    tr.innerHTML = `<td><span class="nm">${esc(c.kpi_name)}</span><span class="cat">${esc(c.category)}</span></td>
+      <td><b>${fmt(k.kpi_id, k.value)}</b>${targetTxt(k) !== '–' ? `<span class="cat tgt-s">target ${targetTxt(k)}</span>` : ''}</td>
+      <td class="${hasYoy ? 'hide-s ' : ''}${chgCls(mo)}">${chgTxt(mo)}</td>
+      ${hasYoy ? `<td class="${chgCls(yo)}">${chgTxt(yo)}</td>` : ''}
+      <td class="hide-s">${targetTxt(k)}</td>
+      <td><span class="v ${vc}">${vt}</span></td>`;
+    const toggle = () => { openKpi = openKpi === k.kpi_id ? null : k.kpi_id; drawStocks(); const r = [...$('stocks').querySelectorAll('tr.k')].find(x => x.dataset.id === k.kpi_id); if (r) r.focus(); };
+    tr.dataset.id = k.kpi_id;
+    tr.addEventListener('click', toggle);
+    tr.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    body.appendChild(tr);
+    if (openKpi === k.kpi_id) {
+      const t2 = document.createElement('tr');
+      t2.className = 'trend';
+      t2.innerHTML = `<td colspan="${hasYoy ? 6 : 5}"><svg class="chart" role="img" aria-label="${esc(c.kpi_name)} by month"></svg>
+        <p><b>${esc(c.kpi_name)}:</b> ${esc(c.definition)}. ${c.target_type === 'none' ? 'Tracked without a target.' : c.target_type === 'absolute' ? `Target ${fmt(k.kpi_id, c.target_value)}, ${c.direction === 'up' ? 'higher' : 'lower'} is better.` : `Target: ${(c.target_value * 100).toFixed(0)}% growth on the same month a year earlier.`}</p></td>`;
+      body.appendChild(t2);
+      trend(t2.querySelector('svg'), k.kpi_id);
+    }
+  });
 }
-function renderScorecard(){
-  const m=K[state.month]; let h='<h2 class="cat-h">Scorecard</h2><div class="tiles">';
-  for(const c of cat){
-    const r=m[c.kpi_id], mom=r.prior_month_value?r.value/r.prior_month_value-1:null, yoy=r.prior_year_value?r.value/r.prior_year_value-1:null;
-    const main=state.cmp==='target'?(r.target!=null?`<span>Target <b>${fmt(c.unit,r.target)}</b></span>`:`<span>${c.target_type==='none'?'Tracked, no target':'No target yet'}</span>`):`<span>Last year <b>${fmt(c.unit,r.prior_year_value)}</b></span>`;
-    h+=`<div class="tile" title="${c.definition}"><span class="eyebrow">${c.category}</span><div class="row"><span class="lbl">${c.kpi_name}</span>${state.cmp==='target'&&r.status?`<span class="pill ${pillCls(r.status)}">${r.status}</span>`:''}</div>
-      <div class="v">${fmt(c.unit,r.value)}</div><div class="cmp">${main}<span>YoY <b class="${better(c.kpi_id,yoy)}">${sp(yoy)}</b></span><span>MoM <b class="${better(c.kpi_id,mom)}">${sp(mom)}</b></span></div>${spark(c.kpi_id)}</div>`;
-  }
-  $('scorecard').innerHTML=h+'</div>';
+
+function trend(svg, id) {
+  const series = months.map(m => kpis.find(k => k.month === m && k.kpi_id === id)).filter(Boolean);
+  const W = Math.max(280, svg.parentElement.clientWidth - 12), H = 120, l = 50, r = 10, t = 12, b = 22;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
+  const vals = series.flatMap(s => [s.value, s.target]).filter(v => v != null);
+  let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * .12 || hi * .05; lo -= pad; hi += pad;
+  const x = i => l + i * (W - l - r) / Math.max(1, series.length - 1), y = v => t + (1 - (v - lo) / (hi - lo)) * (H - t - b);
+  [lo + pad, hi - pad].forEach(v => { el('line', {x1: l, x2: W - r, y1: y(v), y2: y(v), stroke: 'var(--rule)'}, svg); const tx = el('text', {x: l - 6, y: y(v) + 4, 'text-anchor': 'end', class: 'ax'}, svg); tx.textContent = fmt(id, v); });
+  const tg = series.map((s, i) => s.target != null ? `${x(i)},${y(s.target)}` : null).filter(Boolean);
+  if (tg.length > 1) el('polyline', {points: tg.join(' '), fill: 'none', stroke: 'var(--ink-3)', 'stroke-width': 1.2, 'stroke-dasharray': '4 3'}, svg);
+  el('polyline', {points: series.map((s, i) => `${x(i)},${y(s.value)}`).join(' '), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2}, svg);
+  series.forEach((s, i) => {
+    const on = s.month === month;
+    el('circle', {cx: x(i), cy: y(s.value), r: on ? 5 : 2.2, fill: on ? 'var(--paper)' : 'var(--ink)', stroke: on ? 'var(--ink)' : 'none', 'stroke-width': 2}, svg);
+    if (i % 3 === 0 || on) { const tx = el('text', {x: x(i), y: H - 5, 'text-anchor': 'middle', class: on ? 'lb' : 'ax'}, svg); tx.textContent = mShort(s.month) + (s.month.endsWith('-01') ? " '" + s.month.slice(2, 4) : ''); }
+  });
+  if (tg.length > 1) { const f = series.findIndex(s => s.target != null); const tx = el('text', {x: x(f) - 4, y: y(series[f].target) + 4, 'text-anchor': 'end', class: 'ax'}, svg); tx.textContent = 'target'; }
 }
-function tipEl(host){let t=host.querySelector('.tip');if(!t){t=document.createElement('div');t.className='tip';host.appendChild(t)}return t}
-function renderDaily(){
-  const host=$('daily'),W=Math.max(300,host.clientWidth||900),H=W<500?200:250,L=52,R=12,T=10,B=26,n=daily.length;
-  const ma=daily.map((d,i)=>{const s=daily.slice(Math.max(0,i-6),i+1);return s.reduce((a,b)=>a+b.trips,0)/s.length});
-  const hi=Math.ceil(Math.max(...daily.map(d=>d.trips))/50000)*50000, y=v=>T+(H-T-B)*(1-v/hi), x=i=>L+(W-L-R)*i/(n-1);
-  let g='';for(let v=0;v<=hi;v+=hi/4)g+=`<line class="gridl" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${L-8}" y="${y(v)+4}" text-anchor="end">${big(v)}</text>`;
-  const sel=daily.findIndex(d=>d.date_day.slice(0,7)===state.month), selEnd=daily.map(d=>d.date_day.slice(0,7)).lastIndexOf(state.month);
-  if(sel>=0)g+=`<rect x="${x(sel)}" y="${T}" width="${Math.max(2,x(selEnd)-x(sel))}" height="${H-T-B}" fill="var(--s1)" opacity=".07"/>`;
-  const bars=daily.map((d,i)=>`<line x1="${x(i).toFixed(1)}" x2="${x(i).toFixed(1)}" y1="${y(0)}" y2="${y(d.trips).toFixed(1)}" stroke="${d.weather_type==='Snow'?'var(--s2)':'var(--line-2)'}" stroke-width="${d.weather_type==='Snow'?2:1}"/>`).join('');
-  const path=ma.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)).join('');
-  let labs='';daily.forEach((d,i)=>{if(d.date_day.slice(8)==='01'&&(+d.date_day.slice(5,7))%(W<600?6:3)===1)labs+=`<text class="ax" x="${x(i)}" y="${H-7}" text-anchor="middle">${mLabel(d.date_day)}</text>`});
-  host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily taxi trips with 7-day average">${g}${bars}<path d="${path}" fill="none" stroke="var(--s1)" stroke-width="2"/>${labs}<line class="xh" y1="${T}" y2="${H-B}" stroke="var(--text-3)" opacity="0"/><rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="transparent" class="hit"/></svg>`;
-  const sv=host.querySelector('svg'),tp=tipEl(host),xh=sv.querySelector('.xh');
-  sv.querySelector('.hit').addEventListener('pointermove',e=>{const r=sv.getBoundingClientRect(),px=(e.clientX-r.left)/r.width*W,i=Math.max(0,Math.min(n-1,Math.round((px-L)/(W-L-R)*(n-1)))),d=daily[i];
-    xh.setAttribute('x1',x(i));xh.setAttribute('x2',x(i));xh.setAttribute('opacity',.6);
-    const dt=new Date(d.date_day+'T12:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
-    tp.innerHTML=`<b>${dt}</b><br><span>Trips</span> ${d.trips.toLocaleString()}<br><span>Revenue</span> ${usd(d.gross_revenue)}<br><span>Weather</span> ${d.weather_type}${d.snow_in>0?` (${d.snow_in.toFixed(1)}" snow)`:d.precip_in>0.04?` (${d.precip_in.toFixed(2)}" rain)`:''}${d.holiday_name?`<br><span>${d.holiday_name}</span>`:''}`;
-    tp.style.left=Math.min(Math.max(x(i)/W*r.width,90),r.width-90)+'px';tp.style.top=(y(d.trips)/H*r.height)+'px';tp.classList.add('on')});
-  sv.querySelector('.hit').addEventListener('pointerleave',()=>{tp.classList.remove('on');xh.setAttribute('opacity',0)});
+
+function drawDaily() {
+  const svg = $('daily'); svg.innerHTML = '';
+  const W = Math.max(280, svg.parentElement.clientWidth), H = 250, l = 44, r = 8, t = 14, b = 26;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
+  const vmax = Math.max(...daily.map(d => d.trips)) * 1.06;
+  const x = i => l + i * (W - l - r) / (daily.length - 1), y = v => t + (1 - v / vmax) * (H - t - b);
+  const idx = daily.map((d, i) => d.date_day.startsWith(month) ? i : -1).filter(i => i >= 0);
+  if (idx.length) el('rect', {x: x(idx[0]), y: t, width: Math.max(3, x(idx.at(-1)) - x(idx[0])), height: H - t - b, fill: 'var(--hi-wash)'}, svg);
+  [0, .5, 1].forEach(f => { const v = Math.round(vmax / 1.06 * f / 1e4) * 1e4; el('line', {x1: l, x2: W - r, y1: y(v), y2: y(v), stroke: 'var(--rule)'}, svg); const tx = el('text', {x: l - 6, y: y(v) + 4, 'text-anchor': 'end', class: 'ax'}, svg); tx.textContent = big(v); });
+  el('polyline', {points: daily.map((d, i) => `${x(i)},${y(d.trips)}`).join(' '), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 1.1}, svg);
+  daily.forEach((d, i) => { if (d.weather_type === 'Snow') el('path', {d: `M${x(i) - 3.5},${y(d.trips) + 9} l3.5,-6 l3.5,6z`, fill: 'var(--ink)'}, svg); });
+  months.forEach(m => { const i = daily.findIndex(d => d.date_day.startsWith(m)); if (i < 0 || !(m.endsWith('-01') || m.endsWith('-07'))) return; const tx = el('text', {x: x(i), y: H - 6, class: 'ax'}, svg); tx.textContent = mShort(m) + " '" + m.slice(2, 4); });
+  const md = daily.filter(d => d.date_day.startsWith(month));
+  const tot = md.reduce((a, d) => a + d.trips, 0), peak = md.reduce((a, d) => d.trips > a.trips ? d : a, md[0] || {trips: 0}), low = md.reduce((a, d) => d.trips < a.trips ? d : a, md[0] || {trips: 0});
+  const dn = s => new Date(s + 'T12:00').toLocaleDateString('en-US', {weekday: 'long', month: 'short', day: 'numeric'});
+  $('leadH').textContent = md.length ? `${big(tot / md.length)} trips a day in ${new Date(month + '-15').toLocaleDateString('en-US', {month: 'long'})}` : '';
+  $('dailyCap').innerHTML = md.length ? `Busiest day: <b>${dn(peak.date_day)}</b>, ${big(peak.trips)} trips. Quietest: <b>${dn(low.date_day)}</b>, ${big(low.trips)}${low.holiday_name ? ' (' + esc(low.holiday_name) + ')' : low.weather_type !== 'Dry' ? ' (' + esc(low.weather_type.toLowerCase()) + ')' : ''}. Highlighted band: this edition; triangles mark snow days.` : '';
+  svg.setAttribute('aria-label', `Daily valid trips, ${daily[0].date_day} to ${daily.at(-1).date_day}`);
 }
-function renderWeather(){
-  const order=['Dry','Light rain','Heavy rain','Snow'], ws=order.map(o=>weather.find(w=>w.weather_type===o)).filter(Boolean);
-  const mx=Math.max(...ws.map(w=>Math.abs(w.trips_vs_dry)),.05);
-  $('weather').innerHTML=ws.map(w=>{const v=w.trips_vs_dry,pc=Math.abs(v)/mx*50;return `<div class="dbar"><span>${w.weather_type}<small>${w.days} days</small></span><div class="track" style="position:relative;background:var(--surface-2)"><div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line-2)"></div><div class="fill" style="position:absolute;top:0;height:100%;${v>=0?`left:50%`:`right:50%`};width:${pc}%;background:${v>=0?'var(--ok)':'var(--bad)'}"></div></div><span class="n">${w.weather_type==='Dry'?'baseline':sp(v)}<small>${w.avg_speed_mph.toFixed(1)} mph</small></span></div>`}).join('');
-  const snow=weather.find(w=>w.weather_type==='Snow'), rain=weather.find(w=>w.weather_type==='Light rain');
-  $('weatherNote').innerHTML=`Snow days cut trips by <b>${sp(snow.trips_vs_dry,0)}</b> against a comparable dry day, while rain nudges demand <b>up</b> (${sp(rain.trips_vs_dry,0)}): people who'd walk take a cab instead. Holidays are left out so they don't skew the comparison.`;
+
+function drawItems() {
+  const b = boros.filter(x => x.month === month).sort((p, q) => q.trips - p.trips);
+  const tot = b.reduce((a, x) => a + x.trips, 0), bmax = b[0]?.trips || 1;
+  $('boroH').textContent = b.length ? `${b[0].borough} takes ${(b[0].trips / tot * 100).toFixed(0)}% of trips` : '';
+  $('boro').innerHTML = `<thead><tr><th>Borough</th><th>Trips</th><th>Per trip</th><th>mph</th></tr></thead><tbody>${b.map(x => `<tr><td>${esc(x.borough)}</td><td><span class="bar" style="width:${Math.max(2, x.trips / bmax * 40)}px"></span>${big(x.trips)}</td><td>$${x.revenue_per_trip.toFixed(2)}</td><td>${x.avg_speed_mph.toFixed(1)}</td></tr>`).join('')}</tbody>`;
+  const z = zones.filter(x => x.month === month).sort((p, q) => q.trips - p.trips).slice(0, 8);
+  $('zoneH').textContent = z.length ? `${z[0].zone_name} leads the city` : '';
+  $('zones').innerHTML = z.map(x => `<li><span>${esc(x.zone_name)}<small>${esc(x.borough)} · $${x.revenue_per_trip.toFixed(2)} a trip</small></span><span>${big(x.trips)}</span></li>`).join('');
+  const q = dq.filter(x => x.month === month), valid = q.find(x => x.status === 'valid'), ex = q.filter(x => x.status !== 'valid').sort((p, r) => r.records - p.records);
+  const all = q.reduce((a, x) => a + x.records, 0), emax = ex[0]?.records || 1;
+  $('dqH').textContent = valid ? `${(100 - valid.share_of_month * 100).toFixed(1)}% of records set aside` : '';
+  $('dq').innerHTML = `<thead><tr><th>First rule failed</th><th>Records</th></tr></thead><tbody>${ex.map(x => `<tr><td>${esc(x.status[0].toUpperCase() + x.status.slice(1))}</td><td><span class="bar" style="width:${Math.max(2, x.records / emax * 40)}px"></span>${big(x.records)}</td></tr>`).join('')}<tr><td><b>Passed every check</b></td><td><b>${big(valid?.records || 0)}</b> of ${big(all)}</td></tr></tbody>`;
+  // weather for this edition, from the daily mart (holidays left out, as in the 19-month mart)
+  const ed = daily.filter(d => d.date_day.startsWith(month) && !d.is_holiday);
+  const byW = {};
+  ed.forEach(d => { (byW[d.weather_type] ||= []).push(d.trips); });
+  const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+  const dryAvg = byW.Dry ? avg(byW.Dry) : null;
+  const all19 = Object.fromEntries(wx.map(w => [w.weather_type, w]));
+  const kinds = ['Dry', 'Light rain', 'Heavy rain', 'Snow'].filter(k => byW[k]);
+  const wettest = kinds.filter(k => k !== 'Dry').map(k => ({k, v: avg(byW[k]) / dryAvg - 1})).sort((p, q) => p.v - q.v)[0];
+  $('wxH').textContent = wettest && dryAvg ? `${wettest.k} days run ${Math.abs(wettest.v * 100).toFixed(0)}% ${wettest.v < 0 ? 'quieter' : 'busier'} than dry ones` : `${byW.Dry?.length || 0} dry days this month`;
+  $('wx').innerHTML = `<thead><tr><th>Day</th><th>Days</th><th>Trips</th><th>vs dry</th><th>19 mo.</th></tr></thead><tbody>${kinds.map(k => {
+    const v = dryAvg ? avg(byW[k]) / dryAvg - 1 : null, a19 = all19[k];
+    return `<tr><td>${esc(k)}</td><td>${byW[k].length}</td><td>${big(avg(byW[k]))}</td><td>${k === 'Dry' || v == null ? '–' : (v > 0 ? '+' : '−') + Math.abs(v * 100).toFixed(1) + '%'}</td><td>${k === 'Dry' || !a19 ? '–' : (a19.trips_vs_dry > 0 ? '+' : '−') + Math.abs(a19.trips_vs_dry * 100).toFixed(1) + '%'}</td></tr>`;
+  }).join('')}</tbody>`;
+  const hol = daily.filter(d => d.date_day.startsWith(month) && d.is_holiday).length;
+  $('wxCap').textContent = `Central Park weather, ${ed.length} days of ${mName(month)}${hol ? ` (${hol} holiday${hol > 1 ? 's' : ''} left out)` : ''}. "19 mo." compares all ${wx.reduce((a, w) => a + w.days, 0)} non-holiday days, so seasons are mixed in.`;
 }
-function renderHeat(){
-  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], mx=Math.max(...hours.map(h=>h.avg_trips));
-  let h=`<div class="heat" style="grid-template-columns:40px repeat(24,minmax(18px,1fr));min-width:560px"><div></div>`+Array.from({length:24},(_,i)=>`<div class="h">${i%3===0?(i===0?'12a':i<12?i+'a':i===12?'12p':(i-12)+'p'):''}</div>`).join('');
-  for(let d=0;d<7;d++){h+=`<div class="rl">${days[d]}</div>`;for(let k=0;k<24;k++){const c=hours.find(x=>x.weekday_num===d&&x.pickup_hour===k);const v=c?c.avg_trips:0;h+=`<div class="c" style="background:color-mix(in srgb,var(--s1) ${Math.round(v/mx*90)+4}%,transparent);padding:7px 0" title="${days[d]} ${k}:00 · ${Math.round(v).toLocaleString()} trips/hour · ${c?c.avg_speed_mph.toFixed(1):'–'} mph"></div>`}}
-  $('heat').innerHTML=h+'</div>';
+
+function drawHours() {
+  const svg = $('hours'); svg.innerHTML = '';
+  const W = Math.max(280, svg.parentElement.clientWidth), l = 40, t = 6, cw = (W - l - 4) / 24, ch = Math.min(22, Math.max(14, cw * .9)), H = t + ch * 7 + 22;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
+  const hm = hours.filter(h => h.month === month);
+  const max = Math.max(...hm.map(h => h.avg_trips));
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  // weekday_num in the data: 0 = Monday (macro weekday_of)
+  const order = [0, 1, 2, 3, 4, 5, 6];
+  order.forEach((wd, r) => {
+    const tx = el('text', {x: 0, y: t + r * ch + ch * .68, class: 'ax'}, svg); tx.textContent = days[r];
+    for (let h = 0; h < 24; h++) {
+      const c = hm.find(x => x.weekday_num === wd && x.pickup_hour === h);
+      const f = c ? c.avg_trips / max : 0;
+      const rect = el('rect', {x: l + h * cw, y: t + r * ch, width: cw - 1, height: ch - 1, fill: 'var(--ink)', 'fill-opacity': (0.06 + f * .94).toFixed(3)}, svg);
+      const ti = el('title', {}, rect); ti.textContent = `${days[r]} ${h}:00 · ${big(c?.avg_trips || 0)} trips/hour · ${c ? c.avg_speed_mph.toFixed(1) : '–'} mph`;
+    }
+  });
+  [0, 6, 12, 18].forEach(h => { const tx = el('text', {x: l + h * cw, y: H - 6, class: 'ax'}, svg); tx.textContent = h === 0 ? '12am' : h === 12 ? '12pm' : (h % 12) + (h < 12 ? 'am' : 'pm'); });
+  const peak = hm.reduce((a, x) => x.avg_trips > a.avg_trips ? x : a, hm[0]);
+  const names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  $('hourH').textContent = `The busiest hour: ${names[peak.weekday_num]}s at ${peak.pickup_hour % 12 || 12}${peak.pickup_hour < 12 ? 'am' : 'pm'}, ${big(peak.avg_trips)} trips an hour on average`;
+  $('hourCap').textContent = `Average trips in each hour of the week, ${mName(month)}; the heavier the cell, the busier. Hover a cell for trips and average speed.`;
+  svg.setAttribute('aria-label', 'Average trips by weekday and hour');
 }
-function renderTables(){
-  const b=boros.filter(x=>x.month===state.month&&x.borough!=='Unknown'), tot=b.reduce((a,x)=>a+x.trips,0);
-  $('boroSub').textContent=`${mLabel(state.month,1)} · by pickup borough`;
-  $('boros').innerHTML=`<thead><tr><th>Borough</th><th>Trips</th><th>Share</th><th>Per trip</th><th class="hide-sm">Speed</th></tr></thead><tbody>`+b.map(x=>`<tr><td>${x.borough}</td><td>${big(x.trips)}</td><td>${(x.trips/tot*100).toFixed(1)}%</td><td>${usd(x.revenue_per_trip,2)}</td><td class="hide-sm">${x.avg_speed_mph.toFixed(1)} mph</td></tr>`).join('')+'</tbody>';
-  const z=zones.filter(x=>x.month===state.month).slice(0,10), mx=z[0]?.trips||1;
-  $('zoneSub').textContent=`${mLabel(state.month,1)} · top 10`;
-  $('zones').innerHTML=`<thead><tr><th>Zone</th><th>Trips</th><th class="hide-sm">Per trip</th></tr></thead><tbody>`+z.map(x=>`<tr><td>${x.zone_name}<small>${x.borough}</small></td><td><span class="wbar" style="width:${Math.max(3,x.trips/mx*70)}px"></span>${big(x.trips)}</td><td class="hide-sm">${usd(x.revenue_per_trip,2)}</td></tr>`).join('')+'</tbody>';
-  const q=dq.filter(x=>x.month===state.month), rawN=q.reduce((a,x)=>a+x.records,0), ex=q.filter(x=>x.status!=='valid'), exN=ex.reduce((a,x)=>a+x.records,0), emx=Math.max(...ex.map(x=>x.records),1);
-  $('dqSub').textContent=`${mLabel(state.month,1)} · ${big(rawN)} raw records`;
-  $('dq').innerHTML=ex.map(x=>`<div class="dbar"><span>${x.status}</span><div class="track"><div class="fill" style="width:${x.records/emx*100}%;background:var(--s2)"></div></div><span class="n">${big(x.records)}<small>${(x.share_of_month*100).toFixed(2)}%</small></span></div>`).join('');
-  $('dqNote').innerHTML=`<b>${(exN/rawN*100).toFixed(1)}%</b> of this month's raw records were excluded, each with the first rule it failed. They're counted, not deleted, and a test checks that valid plus excluded always equals every record loaded. The build fails if any month loses more than 15%.`;
+
+function render() {
+  const {h, dek} = headline(month);
+  $('hed').textContent = h;
+  $('dek').textContent = dek;
+  const vr = kpis.find(k => k.month === month && k.kpi_id === 'valid_record_rate');
+  const qm = dq.filter(x => x.month === month), all = qm.reduce((a, x) => a + x.records, 0);
+  $('dl').textContent = `${big(all)} records filed this month · ${vr ? (vr.value * 100).toFixed(1) + '% passed' : ''}`;
+  const yoy = kpis.some(k => k.month === month && k.prior_year_value != null);
+  $('byline').textContent = `Figures for ${mName(month)}. Changes compare with the previous month${yoy ? ' and the same month a year earlier' : ''}.`;
+  drawStocks(); drawDaily(); drawItems(); drawHours();
 }
-function renderStatic(){
-  $('defs').innerHTML=cat.map(c=>`<li><b>${c.kpi_name}.</b> ${c.definition}. ${c.target_type==='none'?'Tracked without a target.':`Target: ${c.target_type==='yoy_growth'?'+'+(c.target_value*100)+'% vs. same month last year':(c.direction==='up'?'at least ':'at most ')+fmt(c.unit,c.target_value)}.`}</li>`).join('');
-  $('lineage').innerHTML=`Built from <code>reporting.rpt_kpi_monthly</code> and six supporting marts (dbt) · trip data: <a href="https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page">NYC Taxi &amp; Limousine Commission</a> · weather: Open-Meteo · targets are illustrative · exported ${D.generated} · <a href="https://github.com/evannwilsonn/curbside">github.com/evannwilsonn/curbside</a>`;
-}
-function setMonth(m){state.month=m;$('month').value=m;renderAll()}
-function renderAll(){renderBrief();renderScorecard();renderDaily();renderTables()}
-$('month').innerHTML=[...months].reverse().map(m=>`<option value="${m}">${mLabel(m,1)}</option>`).join('');
-$('month').addEventListener('change',e=>setMonth(e.target.value));
-document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{state.cmp=b.dataset.c;document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderScorecard()}));
-let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(renderDaily,150)});
-renderStatic();renderWeather();renderHeat();renderAll();
+const P = D.pipeline;
+$('earR').innerHTML = `${big(P.raw_records)} records · ${P.files} files · ${P.gigabytes.toFixed(1)} GB<br>${big(P.valid_records)} passed ${P.rules} checks`;
+$('press').innerHTML = [
+  ['Extract', `${P.files} files: ${months.length} months of yellow and green TLC trips, the zone map and Central Park weather, each with a SHA-256 in a manifest.`],
+  ['Load', 'Every file lands as published; columns are matched by name, so fields added later arrive as nulls in older months.'],
+  ['Validate', `${P.rules} rules; each excluded trip keeps the first rule it failed. ${big(P.valid_records)} of ${big(P.raw_records)} pass.`],
+  ['Model', 'dbt star schema: zones, dates with weather and holidays, daily and hourly facts at the grain this page reads.'],
+  ['Report', 'A governed KPI scorecard with definitions and targets as data, plus the marts behind each story.'],
+].map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join('');
+$('foot').textContent = `How this edition is made: DuckDB or Snowflake, dbt, one static page · data exported ${D.generated}`;
+$('theme').addEventListener('click', () => { const r = document.documentElement; const dark = r.dataset.theme ? r.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; r.dataset.theme = dark ? 'light' : 'dark'; });
+render();
+let rt, lw = innerWidth;
+addEventListener('resize', () => { if (innerWidth === lw) return; lw = innerWidth; clearTimeout(rt); rt = setTimeout(render, 120); });
 })();
 </script>
 </body>

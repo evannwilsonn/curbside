@@ -35,7 +35,7 @@ models:
   - name: rpt_hour_of_week
     data_tests:
       - unique_combination:
-          arguments: {columns: [weekday_num, pickup_hour]}
+          arguments: {columns: [month_start, weekday_num, pickup_hour]}
   - name: rpt_weather_impact
     columns:
       - name: weather_type
