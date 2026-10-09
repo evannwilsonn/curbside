@@ -1,0 +1,63 @@
+version: 2
+models:
+  - name: rpt_kpi_monthly
+    description: Executive scorecard, one row per KPI per month with prior month, last year, target and status.
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [month_start, kpi_id]}
+    columns:
+      - name: kpi_id
+        data_tests:
+          - relationships:
+              arguments: {to: ref('kpi_definitions'), field: kpi_id}
+      - name: value
+        data_tests: [not_null]
+      - name: status
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['On track', 'Watch', 'Off track']}
+  - name: rpt_kpi_daily
+    columns:
+      - name: date_day
+        data_tests: [unique, not_null]
+      - name: avg_speed_mph
+        data_tests:
+          - value_between:
+              arguments: {min_value: 5, max_value: 30}
+  - name: rpt_borough_monthly
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [month_start, borough]}
+  - name: rpt_zone_monthly
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [month_start, zone_id]}
+  - name: rpt_hour_of_week
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [weekday_num, pickup_hour]}
+  - name: rpt_weather_impact
+    columns:
+      - name: weather_type
+        data_tests: [unique, not_null]
+  - name: rpt_data_quality_monthly
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [month_start, status]}
+
+exposures:
+  - name: curbside_dashboard
+    type: dashboard
+    maturity: medium
+    url: https://github.com/evannwilsonn/curbside/tree/main/dashboard
+    description: Executive KPI dashboard fed by the trip pipeline.
+    depends_on:
+      - ref('rpt_kpi_monthly')
+      - ref('rpt_kpi_daily')
+      - ref('rpt_borough_monthly')
+      - ref('rpt_zone_monthly')
+      - ref('rpt_hour_of_week')
+      - ref('rpt_weather_impact')
+      - ref('rpt_data_quality_monthly')
+    owner:
+      name: Evan Wilson

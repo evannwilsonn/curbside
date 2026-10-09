@@ -1,0 +1,8 @@
+payment_type,payment_name,is_charged
+0,Flex fare (app),true
+1,Credit card,true
+2,Cash,true
+3,No charge,false
+4,Dispute,false
+5,Unknown,true
+6,Voided trip,false

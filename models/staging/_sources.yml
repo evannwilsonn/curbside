@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: tlc
+    description: >
+      NYC Taxi & Limousine Commission trip records (official monthly Parquet files), loaded as published.
+      Yellow taxis serve all five boroughs and the airports; green "boro" taxis pick up outside central Manhattan.
+    schema: raw_tlc
+    loaded_at_field: _loaded_at
+    freshness:
+      warn_after: {count: 35, period: day}
+    tables:
+      - name: yellow_trips
+        description: One row per yellow-taxi trip as reported by the meter vendors (tpep_ columns).
+      - name: green_trips
+        description: One row per green-taxi trip (lpep_ columns). No airport fee column.
+      - name: taxi_zones
+        description: The 265 TLC taxi zones with borough and service zone. 264 is Unknown, 265 is outside NYC.
+      - name: _extract_manifest
+        description: One row per extracted file with URL, row count and SHA-256.
+        freshness: null
+  - name: weather
+    schema: raw_weather
+    tables:
+      - name: central_park_daily
+        description: Open-Meteo historical daily weather for Central Park, one JSON document of parallel arrays.

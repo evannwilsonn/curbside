@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Curbside</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f4f5f7;--surface:#ffffff;--surface-2:#f8f9fb;--line:#e3e5ea;--line-2:#d3d6dd;
+  --text:#14161c;--text-2:#4a4f5c;--text-3:#767b88;
+  --s1:#2a6fdb;--s2:#a8630f;--s3:#16865a;--up:#16865a;--down:#c2412d;--focus:#2a6fdb;
+  --ok:#16865a;--ok-bg:rgba(22,134,90,.10);--warn:#a8630f;--warn-bg:rgba(168,99,15,.12);--bad:#c2412d;--bad-bg:rgba(194,65,45,.10);
+  --font:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#0c0c12;--surface:#13131b;--surface-2:#191922;--line:#25252f;--line-2:#33333f;
+  --text:#f2f3f6;--text-2:#b4b7c2;--text-3:#878a96;--s1:#3d7eff;--s2:#c27a1a;--s3:#1fa36b;--up:#4cc38a;--down:#ff7a6b;--focus:#7ea8ff;
+  --ok:#4cc38a;--ok-bg:rgba(76,195,138,.12);--warn:#e0a24a;--warn-bg:rgba(224,162,74,.13);--bad:#ff7a6b;--bad-bg:rgba(255,122,107,.12)}}
+:root[data-theme="dark"]{
+  color-scheme:dark;--bg:#0c0c12;--surface:#13131b;--surface-2:#191922;--line:#25252f;--line-2:#33333f;
+  --text:#f2f3f6;--text-2:#b4b7c2;--text-3:#878a96;--s1:#3d7eff;--s2:#c27a1a;--s3:#1fa36b;--up:#4cc38a;--down:#ff7a6b;--focus:#7ea8ff;
+  --ok:#4cc38a;--ok-bg:rgba(76,195,138,.12);--warn:#e0a24a;--warn-bg:rgba(224,162,74,.13);--bad:#ff7a6b;--bad-bg:rgba(255,122,107,.12)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 var(--font)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1320px;margin:0 auto;padding:24px 20px 48px}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.brand h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.01em}
+.brand p{margin:4px 0 0;color:var(--text-2);font-size:14px}
+.badge{display:inline-block;margin-left:8px;font:500 11px var(--mono);color:var(--text-3);border:1px solid var(--line-2);border-radius:999px;padding:2px 8px;vertical-align:3px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+select{font:500 13px var(--font);color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer}
+.seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{font:500 13px var(--font);color:var(--text-2);background:none;border:0;border-radius:7px;padding:7px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--text);box-shadow:inset 0 0 0 1px var(--line-2)}
+.brief{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center}
+.brief p{margin:0;font-size:15.5px;line-height:1.55;max-width:90ch}
+.brief p b{font-weight:600}
+.tally{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;font:600 12px var(--font);border-radius:999px;padding:3px 10px;white-space:nowrap}
+.pill.ok{color:var(--ok);background:var(--ok-bg)}.pill.warn{color:var(--warn);background:var(--warn-bg)}.pill.bad{color:var(--bad);background:var(--bad-bg)}.pill.na{color:var(--text-3);background:var(--surface-2)}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.cat-h{margin:18px 2px 8px;font:600 12px var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tile .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tile .eyebrow{font:500 10.5px var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
+.tile .lbl{font-size:13px;font-weight:500;color:var(--text-2)}
+.tile .v{font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.tile .cmp{font-size:12.5px;color:var(--text-3);display:flex;gap:12px;flex-wrap:wrap}
+.tile .cmp b{font-weight:600}
+.tile svg{display:block;width:100%;height:34px;margin-top:4px}
+.good{color:var(--up)}.badc{color:var(--down)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.card header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.card h2{margin:0;font-size:15px;font-weight:600}
+.card .sub{font-size:12.5px;color:var(--text-3)}
+.full{grid-column:1/-1}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--text-2)}
+.legend i{display:inline-block;width:12px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.legend i.ln{height:2px;vertical-align:3px}
+.plot{position:relative}
+.plot svg{display:block;width:100%;height:auto;overflow:visible}
+.ax{font:11px var(--font);fill:var(--text-3)}
+.gridl{stroke:var(--line);stroke-width:1}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line-2);border-radius:10px;padding:8px 10px;font-size:12.5px;white-space:nowrap;opacity:0;transform:translate(-50%,calc(-100% - 12px));transition:opacity .12s;z-index:3;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.tip.on{opacity:1}.tip b{font-weight:600}.tip span{color:var(--text-2)}
+.callout{margin:12px 0 0;padding:10px 12px;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;font-size:13.5px;color:var(--text-2)}
+.callout b{color:var(--text);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-weight:500;color:var(--text-3);text-align:right;padding:8px 6px;border-bottom:1px solid var(--line);font-size:12px;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td .wbar{display:inline-block;height:8px;border-radius:3px;background:var(--s1);margin-right:8px;vertical-align:0}
+.dbar{display:grid;grid-template-columns:150px minmax(0,1fr) 92px;gap:10px;align-items:center;padding:6px 0;font-size:13px}
+.dbar .track{height:14px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.dbar .fill{height:100%;border-radius:4px}
+.dbar .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--text-2)}
+.dbar small{display:block;color:var(--text-3);font-size:11.5px}
+.heat{display:grid;gap:3px;font-size:11.5px;font-variant-numeric:tabular-nums}
+.heat .c{padding:5px 2px;text-align:center;border-radius:4px;color:var(--text)}
+.heat .h{color:var(--text-3);text-align:center;padding:4px 0}
+.heat .rl{color:var(--text-2);text-align:left;padding:5px 4px;white-space:nowrap}
+.defs{margin:0;padding:0;list-style:none;font-size:13px}
+.defs li{padding:7px 0;border-bottom:1px solid var(--line);color:var(--text-2)}
+.defs li:last-child{border-bottom:0}
+.defs b{color:var(--text);font-weight:600}
+footer.lin{margin-top:18px;color:var(--text-3);font-size:12.5px;line-height:1.6}
+footer.lin code{font-family:var(--mono);font-size:12px;color:var(--text-2)}
+footer.lin a{color:var(--text-2)}
+@media (max-width:1100px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}.brief{grid-template-columns:1fr}}
+@media (max-width:560px){.tiles{grid-template-columns:1fr}.hide-sm{display:none}.dbar{grid-template-columns:110px minmax(0,1fr) 80px}}
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.step{padding:14px 16px;border-right:1px solid var(--line)}.step:last-child{border-right:0}
+td small{display:block;color:var(--text-3);font-size:11.5px}
+.step .n{font:500 11px var(--mono);color:var(--text-3)}.step b{display:block;font-size:14px;font-weight:600;margin:2px 0}.step span{font-size:12.5px;color:var(--text-2)}
+@media (max-width:900px){.flow{grid-template-columns:1fr}.step{border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Curbside <span class="badge">Real public data</span></h1>
+      <p>NYC taxi operations · end-to-end pipeline and executive KPI dashboard · official TLC trip records</p>
+    </div>
+    <div class="controls">
+      <label><span hidden>Month</span><select id="month" aria-label="Reporting month"></select></label>
+      <div class="seg" role="group" aria-label="Compare against">
+        <button type="button" data-c="target" aria-pressed="true">vs. target</button>
+        <button type="button" data-c="yoy" aria-pressed="false">vs. last year</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="flow" id="flow" aria-label="Pipeline"></section>
+  <section class="brief" aria-label="Summary"><p id="brief"></p><div class="tally" id="tally"></div></section>
+  <section id="scorecard" aria-label="KPI scorecard"></section>
+
+  <section class="grid">
+    <article class="card full">
+      <header><h2>Daily trips</h2>
+        <div class="legend"><span><i class="ln" style="background:var(--s1)"></i>7-day average</span><span><i style="background:var(--line-2)"></i>Daily</span><span><i style="background:var(--s2)"></i>Snow day</span></div></header>
+      <div class="plot" id="daily"></div>
+    </article>
+    <article class="card">
+      <header><h2>Weather and demand</h2><span class="sub">Trips vs. a dry day of the same kind (weekday or weekend)</span></header>
+      <div id="weather"></div>
+      <p class="callout" id="weatherNote"></p>
+    </article>
+    <article class="card">
+      <header><h2>When people ride</h2><span class="sub">Average trips per hour, last 3 months</span></header>
+      <div id="heat" style="overflow-x:auto"></div>
+    </article>
+    <article class="card">
+      <header><h2>Boroughs</h2><span class="sub" id="boroSub"></span></header>
+      <div style="overflow-x:auto"><table id="boros"></table></div>
+    </article>
+    <article class="card">
+      <header><h2>Busiest pickup zones</h2><span class="sub" id="zoneSub"></span></header>
+      <div style="overflow-x:auto"><table id="zones"></table></div>
+    </article>
+    <article class="card">
+      <header><h2>What the pipeline excluded</h2><span class="sub" id="dqSub"></span></header>
+      <div id="dq"></div>
+      <p class="callout" id="dqNote"></p>
+    </article>
+    <article class="card">
+      <header><h2>KPI definitions</h2><span class="sub">One governed definition per metric, from <code>seeds/kpi_definitions.csv</code></span></header>
+      <ul class="defs" id="defs"></ul>
+    </article>
+  </section>
+  <footer class="lin" id="lineage"></footer>
+</div>
+
+<script>
+(async function(){
+const D = window.CB_DATA || await fetch('data.json').then(r=>r.json());
+const $ = id => document.getElementById(id);
+const objs = t => t.rows.map(r=>Object.fromEntries(t.columns.map((c,i)=>[c,r[i]])));
+const cat=objs(D.kpi_catalog), kpis=objs(D.kpis), daily=objs(D.daily), boros=objs(D.boroughs), zones=objs(D.zones), hours=objs(D.hours), weather=objs(D.weather), dq=objs(D.dq);
+const CAT=Object.fromEntries(cat.map(k=>[k.kpi_id,k]));
+const months=[...new Set(kpis.map(r=>r.month))].sort();
+const K={}; kpis.forEach(r=>{(K[r.month] ||= {})[r.kpi_id]=r});
+let state={month:months[months.length-1], cmp:'target'};
+const P=D.pipeline;
+
+const mLabel=(m,long)=>new Date(m.slice(0,7)+'-15').toLocaleDateString('en-US',long?{month:'long',year:'numeric'}:{month:'short',year:'2-digit'});
+const usd=(v,d=0)=>{if(v==null)return '–';const a=Math.abs(v);return a>=1e6?'$'+(v/1e6).toFixed(1)+'M':a>=1e4?'$'+Math.round(v/1e3)+'K':'$'+v.toFixed(d)};
+const big=v=>v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e4?Math.round(v/1e3)+'K':Math.round(v).toLocaleString('en-US');
+const fmt=(u,v)=>v==null?'–':u==='currency'?usd(v,2):u==='percent'?(v*100).toFixed(1)+'%':u==='mph'?v.toFixed(1)+' mph':u==='minutes'?v.toFixed(1)+' min':big(v);
+const sp=(v,d=1)=>v==null||!isFinite(v)?'–':(v>0?'+':'')+(v*100).toFixed(d)+'%';
+const pillCls=s=>s==='On track'?'ok':s==='Watch'?'warn':s==='Off track'?'bad':'na';
+const better=(k,x)=>x==null?'':((CAT[k].direction==='up')===(x>0)?'good':'badc');
+
+$('flow').innerHTML=[
+  ['01','Extract',`${P.files} files from NYC TLC and Open-Meteo, ${P.gigabytes.toFixed(1)} GB, SHA-256 logged`],
+  ['02','Load',`${(P.raw_records/1e6).toFixed(1)}M raw trip records landed as published`],
+  ['03','Validate',`${P.rules} rules; ${(P.valid_records/P.raw_records*100).toFixed(1)}% of records pass`],
+  ['04','Model',`dbt star schema with weather, holidays and zones; tested on every build`],
+  ['05','Report',`${cat.length} governed KPIs with targets and year-over-year`],
+].map(([n,b,s])=>`<div class="step"><span class="n">${n}</span><b>${b}</b><span>${s}</span></div>`).join('');
+
+function renderBrief(){
+  const m=K[state.month], t=m.trips, r=m.gross_revenue, s=m.avg_speed_mph;
+  const st=Object.values(m).filter(x=>x.status), ok=st.filter(x=>x.status==='On track').length, w=st.filter(x=>x.status==='Watch'), b=st.filter(x=>x.status==='Off track');
+  const names=a=>a.map(x=>CAT[x.kpi_id].kpi_name.toLowerCase()).join(', ');
+  const yo=(x)=>x.prior_year_value?` (${sp(x.value/x.prior_year_value-1,1)} year over year)`:'';
+  let h=`<b>${mLabel(state.month,1)}:</b> ${big(t.value)} trips${yo(t)} brought in <b>${usd(r.value)}</b>${yo(r)}. Average speed was ${s.value.toFixed(1)} mph and each trip earned ${usd(m.revenue_per_trip.value,2)}. `;
+  h+=st.length?`${ok} of ${st.length} targeted KPIs are on track`+(b.length?`; off track: ${names(b)}`:'')+(w.length?`; watch: ${names(w)}`:'')+'.':'Targets start once there is a year to compare against.';
+  $('brief').innerHTML=h;
+  $('tally').innerHTML=st.length?`<span class="pill ok">${ok} on track</span><span class="pill warn">${w.length} watch</span><span class="pill bad">${b.length} off track</span>`:'<span class="pill na">No plan yet</span>';
+}
+function spark(k){
+  const i=months.indexOf(state.month), ms=months.slice(Math.max(0,i-11),i+1), vs=ms.map(m=>K[m][k].value);
+  const W=200,H=34,lo=Math.min(...vs),hi=Math.max(...vs),y=v=>hi===lo?H/2:3+(H-6)*(1-(v-lo)/(hi-lo)),x=j=>ms.length===1?W/2:2+(W-4)*j/(ms.length-1);
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${vs.map((v,j)=>(j?'L':'M')+x(j).toFixed(1)+' '+y(v).toFixed(1)).join('')}" fill="none" stroke="var(--s1)" stroke-width="1.6" vector-effect="non-scaling-stroke"/><circle cx="${x(vs.length-1)}" cy="${y(vs[vs.length-1])}" r="2.5" fill="var(--s1)"/></svg>`;
+}
+function renderScorecard(){
+  const m=K[state.month]; let h='<h2 class="cat-h">Scorecard</h2><div class="tiles">';
+  for(const c of cat){
+    const r=m[c.kpi_id], mom=r.prior_month_value?r.value/r.prior_month_value-1:null, yoy=r.prior_year_value?r.value/r.prior_year_value-1:null;
+    const main=state.cmp==='target'?(r.target!=null?`<span>Target <b>${fmt(c.unit,r.target)}</b></span>`:`<span>${c.target_type==='none'?'Tracked, no target':'No target yet'}</span>`):`<span>Last year <b>${fmt(c.unit,r.prior_year_value)}</b></span>`;
+    h+=`<div class="tile" title="${c.definition}"><span class="eyebrow">${c.category}</span><div class="row"><span class="lbl">${c.kpi_name}</span>${state.cmp==='target'&&r.status?`<span class="pill ${pillCls(r.status)}">${r.status}</span>`:''}</div>
+      <div class="v">${fmt(c.unit,r.value)}</div><div class="cmp">${main}<span>YoY <b class="${better(c.kpi_id,yoy)}">${sp(yoy)}</b></span><span>MoM <b class="${better(c.kpi_id,mom)}">${sp(mom)}</b></span></div>${spark(c.kpi_id)}</div>`;
+  }
+  $('scorecard').innerHTML=h+'</div>';
+}
+function tipEl(host){let t=host.querySelector('.tip');if(!t){t=document.createElement('div');t.className='tip';host.appendChild(t)}return t}
+function renderDaily(){
+  const host=$('daily'),W=Math.max(300,host.clientWidth||900),H=W<500?200:250,L=52,R=12,T=10,B=26,n=daily.length;
+  const ma=daily.map((d,i)=>{const s=daily.slice(Math.max(0,i-6),i+1);return s.reduce((a,b)=>a+b.trips,0)/s.length});
+  const hi=Math.ceil(Math.max(...daily.map(d=>d.trips))/50000)*50000, y=v=>T+(H-T-B)*(1-v/hi), x=i=>L+(W-L-R)*i/(n-1);
+  let g='';for(let v=0;v<=hi;v+=hi/4)g+=`<line class="gridl" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${L-8}" y="${y(v)+4}" text-anchor="end">${big(v)}</text>`;
+  const sel=daily.findIndex(d=>d.date_day.slice(0,7)===state.month), selEnd=daily.map(d=>d.date_day.slice(0,7)).lastIndexOf(state.month);
+  if(sel>=0)g+=`<rect x="${x(sel)}" y="${T}" width="${Math.max(2,x(selEnd)-x(sel))}" height="${H-T-B}" fill="var(--s1)" opacity=".07"/>`;
+  const bars=daily.map((d,i)=>`<line x1="${x(i).toFixed(1)}" x2="${x(i).toFixed(1)}" y1="${y(0)}" y2="${y(d.trips).toFixed(1)}" stroke="${d.weather_type==='Snow'?'var(--s2)':'var(--line-2)'}" stroke-width="${d.weather_type==='Snow'?2:1}"/>`).join('');
+  const path=ma.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)).join('');
+  let labs='';daily.forEach((d,i)=>{if(d.date_day.slice(8)==='01'&&(+d.date_day.slice(5,7))%(W<600?6:3)===1)labs+=`<text class="ax" x="${x(i)}" y="${H-7}" text-anchor="middle">${mLabel(d.date_day)}</text>`});
+  host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily taxi trips with 7-day average">${g}${bars}<path d="${path}" fill="none" stroke="var(--s1)" stroke-width="2"/>${labs}<line class="xh" y1="${T}" y2="${H-B}" stroke="var(--text-3)" opacity="0"/><rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="transparent" class="hit"/></svg>`;
+  const sv=host.querySelector('svg'),tp=tipEl(host),xh=sv.querySelector('.xh');
+  sv.querySelector('.hit').addEventListener('pointermove',e=>{const r=sv.getBoundingClientRect(),px=(e.clientX-r.left)/r.width*W,i=Math.max(0,Math.min(n-1,Math.round((px-L)/(W-L-R)*(n-1)))),d=daily[i];
+    xh.setAttribute('x1',x(i));xh.setAttribute('x2',x(i));xh.setAttribute('opacity',.6);
+    const dt=new Date(d.date_day+'T12:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+    tp.innerHTML=`<b>${dt}</b><br><span>Trips</span> ${d.trips.toLocaleString()}<br><span>Revenue</span> ${usd(d.gross_revenue)}<br><span>Weather</span> ${d.weather_type}${d.snow_in>0?` (${d.snow_in.toFixed(1)}" snow)`:d.precip_in>0.04?` (${d.precip_in.toFixed(2)}" rain)`:''}${d.holiday_name?`<br><span>${d.holiday_name}</span>`:''}`;
+    tp.style.left=Math.min(Math.max(x(i)/W*r.width,90),r.width-90)+'px';tp.style.top=(y(d.trips)/H*r.height)+'px';tp.classList.add('on')});
+  sv.querySelector('.hit').addEventListener('pointerleave',()=>{tp.classList.remove('on');xh.setAttribute('opacity',0)});
+}
+function renderWeather(){
+  const order=['Dry','Light rain','Heavy rain','Snow'], ws=order.map(o=>weather.find(w=>w.weather_type===o)).filter(Boolean);
+  const mx=Math.max(...ws.map(w=>Math.abs(w.trips_vs_dry)),.05);
+  $('weather').innerHTML=ws.map(w=>{const v=w.trips_vs_dry,pc=Math.abs(v)/mx*50;return `<div class="dbar"><span>${w.weather_type}<small>${w.days} days</small></span><div class="track" style="position:relative;background:var(--surface-2)"><div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line-2)"></div><div class="fill" style="position:absolute;top:0;height:100%;${v>=0?`left:50%`:`right:50%`};width:${pc}%;background:${v>=0?'var(--ok)':'var(--bad)'}"></div></div><span class="n">${w.weather_type==='Dry'?'baseline':sp(v)}<small>${w.avg_speed_mph.toFixed(1)} mph</small></span></div>`}).join('');
+  const snow=weather.find(w=>w.weather_type==='Snow'), rain=weather.find(w=>w.weather_type==='Light rain');
+  $('weatherNote').innerHTML=`Snow days cut trips by <b>${sp(snow.trips_vs_dry,0)}</b> against a comparable dry day, while rain nudges demand <b>up</b> (${sp(rain.trips_vs_dry,0)}): people who'd walk take a cab instead. Holidays are left out so they don't skew the comparison.`;
+}
+function renderHeat(){
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], mx=Math.max(...hours.map(h=>h.avg_trips));
+  let h=`<div class="heat" style="grid-template-columns:40px repeat(24,minmax(18px,1fr));min-width:560px"><div></div>`+Array.from({length:24},(_,i)=>`<div class="h">${i%3===0?(i===0?'12a':i<12?i+'a':i===12?'12p':(i-12)+'p'):''}</div>`).join('');
+  for(let d=0;d<7;d++){h+=`<div class="rl">${days[d]}</div>`;for(let k=0;k<24;k++){const c=hours.find(x=>x.weekday_num===d&&x.pickup_hour===k);const v=c?c.avg_trips:0;h+=`<div class="c" style="background:color-mix(in srgb,var(--s1) ${Math.round(v/mx*90)+4}%,transparent);padding:7px 0" title="${days[d]} ${k}:00 · ${Math.round(v).toLocaleString()} trips/hour · ${c?c.avg_speed_mph.toFixed(1):'–'} mph"></div>`}}
+  $('heat').innerHTML=h+'</div>';
+}
+function renderTables(){
+  const b=boros.filter(x=>x.month===state.month&&x.borough!=='Unknown'), tot=b.reduce((a,x)=>a+x.trips,0);
+  $('boroSub').textContent=`${mLabel(state.month,1)} · by pickup borough`;
+  $('boros').innerHTML=`<thead><tr><th>Borough</th><th>Trips</th><th>Share</th><th>Per trip</th><th class="hide-sm">Speed</th></tr></thead><tbody>`+b.map(x=>`<tr><td>${x.borough}</td><td>${big(x.trips)}</td><td>${(x.trips/tot*100).toFixed(1)}%</td><td>${usd(x.revenue_per_trip,2)}</td><td class="hide-sm">${x.avg_speed_mph.toFixed(1)} mph</td></tr>`).join('')+'</tbody>';
+  const z=zones.filter(x=>x.month===state.month).slice(0,10), mx=z[0]?.trips||1;
+  $('zoneSub').textContent=`${mLabel(state.month,1)} · top 10`;
+  $('zones').innerHTML=`<thead><tr><th>Zone</th><th>Trips</th><th class="hide-sm">Per trip</th></tr></thead><tbody>`+z.map(x=>`<tr><td>${x.zone_name}<small>${x.borough}</small></td><td><span class="wbar" style="width:${Math.max(3,x.trips/mx*70)}px"></span>${big(x.trips)}</td><td class="hide-sm">${usd(x.revenue_per_trip,2)}</td></tr>`).join('')+'</tbody>';
+  const q=dq.filter(x=>x.month===state.month), rawN=q.reduce((a,x)=>a+x.records,0), ex=q.filter(x=>x.status!=='valid'), exN=ex.reduce((a,x)=>a+x.records,0), emx=Math.max(...ex.map(x=>x.records),1);
+  $('dqSub').textContent=`${mLabel(state.month,1)} · ${big(rawN)} raw records`;
+  $('dq').innerHTML=ex.map(x=>`<div class="dbar"><span>${x.status}</span><div class="track"><div class="fill" style="width:${x.records/emx*100}%;background:var(--s2)"></div></div><span class="n">${big(x.records)}<small>${(x.share_of_month*100).toFixed(2)}%</small></span></div>`).join('');
+  $('dqNote').innerHTML=`<b>${(exN/rawN*100).toFixed(1)}%</b> of this month's raw records were excluded, each with the first rule it failed. They're counted, not deleted, and a test checks that valid plus excluded always equals every record loaded. The build fails if any month loses more than 15%.`;
+}
+function renderStatic(){
+  $('defs').innerHTML=cat.map(c=>`<li><b>${c.kpi_name}.</b> ${c.definition}. ${c.target_type==='none'?'Tracked without a target.':`Target: ${c.target_type==='yoy_growth'?'+'+(c.target_value*100)+'% vs. same month last year':(c.direction==='up'?'at least ':'at most ')+fmt(c.unit,c.target_value)}.`}</li>`).join('');
+  $('lineage').innerHTML=`Built from <code>reporting.rpt_kpi_monthly</code> and six supporting marts (dbt) · trip data: <a href="https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page">NYC Taxi &amp; Limousine Commission</a> · weather: Open-Meteo · targets are illustrative · exported ${D.generated} · <a href="https://github.com/evannwilsonn/curbside">github.com/evannwilsonn/curbside</a>`;
+}
+function setMonth(m){state.month=m;$('month').value=m;renderAll()}
+function renderAll(){renderBrief();renderScorecard();renderDaily();renderTables()}
+$('month').innerHTML=[...months].reverse().map(m=>`<option value="${m}">${mLabel(m,1)}</option>`).join('');
+$('month').addEventListener('change',e=>setMonth(e.target.value));
+document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{state.cmp=b.dataset.c;document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderScorecard()}));
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(renderDaily,150)});
+renderStatic();renderWeather();renderHeat();renderAll();
+})();
+</script>
+</body>
+</html>

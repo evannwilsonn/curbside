@@ -1,0 +1,31 @@
+version: 2
+seeds:
+  - name: kpi_definitions
+    description: >
+      Governed KPI catalog: one definition, unit, direction and target per metric. Targets are
+      illustrative plan figures set for this project; "none" marks KPIs tracked without a target.
+    config:
+      column_types: {target_value: double, sort_order: integer}
+    columns:
+      - name: kpi_id
+        data_tests: [unique, not_null]
+      - name: direction
+        data_tests:
+          - accepted_values:
+              arguments: {values: [up, down]}
+      - name: target_type
+        data_tests:
+          - accepted_values:
+              arguments: {values: [absolute, yoy_growth, none]}
+  - name: payment_types
+    columns:
+      - name: payment_type
+        data_tests: [unique, not_null]
+  - name: rate_codes
+    columns:
+      - name: rate_code
+        data_tests: [unique, not_null]
+  - name: holidays
+    columns:
+      - name: holiday_date
+        data_tests: [unique, not_null]

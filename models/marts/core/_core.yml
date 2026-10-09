@@ -1,0 +1,49 @@
+version: 2
+models:
+  - name: dim_zones
+    columns:
+      - name: zone_id
+        data_tests: [unique, not_null]
+  - name: dim_date
+    columns:
+      - name: date_day
+        data_tests: [unique, not_null]
+      - name: weather_type
+        data_tests:
+          - accepted_values:
+              arguments: {values: [Dry, Light rain, Heavy rain, Snow]}
+  - name: fct_trips_daily
+    description: Valid trips by day, pickup zone, service and payment type.
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [pickup_date, service, pickup_zone_id, payment_type]}
+    columns:
+      - name: pickup_zone_id
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_zones'), field: zone_id}
+      - name: pickup_date
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_date'), field: date_day}
+      - name: payment_type
+        data_tests:
+          - relationships:
+              arguments: {to: ref('payment_types'), field: payment_type}
+      - name: trips
+        data_tests:
+          - value_between:
+              arguments: {min_value: 1}
+  - name: fct_trips_hourly
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [pickup_date, pickup_hour, service]}
+    columns:
+      - name: pickup_hour
+        data_tests:
+          - value_between:
+              arguments: {min_value: 0, max_value: 23}
+  - name: fct_data_quality
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [file_month, service, status]}

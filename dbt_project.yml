@@ -1,0 +1,42 @@
+name: curbside
+version: "1.0.0"
+config-version: 2
+profile: curbside
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  curbside:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: table
+      +schema: intermediate
+    marts:
+      +materialized: table
+      core:
+        +schema: core
+      reporting:
+        +schema: reporting
+
+seeds:
+  curbside:
+    +schema: reference
+
+vars:
+  report_start: "2025-01-01"
+  report_end: "2026-07-31"
+  # a KPI within this relative distance of its target is "Watch" rather than "Off track"
+  watch_band: 0.03
+  # validation limits for a single trip
+  max_trip_hours: 6
+  max_trip_miles: 100
+  max_avg_mph: 80
+  # build fails if more than this share of raw records is excluded in any month
+  max_excluded_share: 0.15

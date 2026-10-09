@@ -1,0 +1,12 @@
+version: 2
+models:
+  - name: int_trips__validated
+    description: Every raw trip with derived measures and the first validation rule it failed (null if valid).
+    columns:
+      - name: exclusion_reason
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['pickup outside file month', 'drop-off not after pickup', 'trip over 6 hours',
+                         'no charge, dispute or void', 'negative amount', 'zero total', 'zero distance',
+                         'distance over 100 miles', 'average speed over 80 mph', 'unknown pickup zone']
